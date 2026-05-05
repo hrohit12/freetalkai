@@ -47,10 +47,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <Script 
-          src="https://pl29340285.profitablecpmratenetwork.com/3d/d1/6d/3dd16d87dff21a5df0fa48bd6200a645.js" 
-          strategy="beforeInteractive" 
-        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
