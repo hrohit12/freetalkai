@@ -20,6 +20,7 @@ import {
   SuggestionPrimitive,
   ThreadPrimitive,
   useAuiState,
+  useThreadRuntime,
 } from "@assistant-ui/react";
 import {
   ArrowDownIcon,
@@ -35,6 +36,14 @@ import {
   SquareIcon,
 } from "lucide-react";
 import type { FC } from "react";
+import { useModel } from "@/lib/ModelContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Cpu } from "lucide-react";
 
 export const Thread: FC = () => {
   return (
@@ -108,61 +117,48 @@ const ThreadWelcome: FC = () => {
     <div className="aui-thread-welcome-root my-auto flex grow flex-col">
       <div className="aui-thread-welcome-center flex w-full grow flex-col items-center justify-center">
         <div className="aui-thread-welcome-message flex size-full flex-col justify-center px-4">
-          <h1 className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-semibold text-2xl duration-200">
+          <div className="mb-4 flex items-center gap-2 text-indigo-600">
+            <Cpu className="size-6" />
+          </div>
+          <h1 className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both font-semibold text-4xl tracking-tight duration-200">
             Hello there!
           </h1>
-          <p className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-muted-foreground text-xl delay-75 duration-200">
-            How can I help you today?
+          <p className="aui-thread-welcome-message-inner fade-in slide-in-from-bottom-1 animate-in fill-mode-both text-muted-foreground text-2xl delay-75 duration-200">
+            Where would you like to start?
           </p>
         </div>
       </div>
-      <ThreadSuggestions />
     </div>
   );
 };
 
-const ThreadSuggestions: FC = () => {
-  return (
-    <div className="aui-thread-welcome-suggestions grid w-full @md:grid-cols-2 gap-2 pb-4">
-      <ThreadPrimitive.Suggestions>
-        {() => <ThreadSuggestionItem />}
-      </ThreadPrimitive.Suggestions>
-    </div>
-  );
-};
 
-const ThreadSuggestionItem: FC = () => {
-  return (
-    <div className="aui-thread-welcome-suggestion-display fade-in slide-in-from-bottom-2 @md:nth-[n+3]:block nth-[n+3]:hidden animate-in fill-mode-both duration-200">
-      <SuggestionPrimitive.Trigger send asChild>
-        <Button
-          variant="ghost"
-          className="aui-thread-welcome-suggestion h-auto w-full @md:flex-col flex-wrap items-start justify-start gap-1 rounded-3xl border bg-background px-4 py-3 text-left text-sm transition-colors hover:bg-muted"
-        >
-          <SuggestionPrimitive.Title className="aui-thread-welcome-suggestion-text-1 font-medium" />
-          <SuggestionPrimitive.Description className="aui-thread-welcome-suggestion-text-2 text-muted-foreground empty:hidden" />
-        </Button>
-      </SuggestionPrimitive.Trigger>
-    </div>
-  );
-};
 
 const Composer: FC = () => {
   return (
     <ComposerPrimitive.Root className="aui-composer-root relative flex w-full flex-col">
-        <div
-          data-slot="aui_composer-shell"
-          className="flex w-full flex-col gap-2 rounded-(--composer-radius) border bg-background/95 backdrop-blur-sm p-(--composer-padding) shadow-[0_0_20px_-5px_rgba(0,0,0,0.1)] transition-all focus-within:border-ring/75 focus-within:ring-2 focus-within:ring-ring/20 focus-within:shadow-[0_0_30px_-5px_rgba(0,0,0,0.15)]"
-        >
-          <ComposerPrimitive.Input
-            placeholder="Send a message..."
-            className="aui-composer-input max-h-32 min-h-10 w-full resize-none bg-transparent px-1.75 py-1 text-sm outline-none placeholder:text-muted-foreground/80"
-            rows={1}
-            autoFocus
-            aria-label="Message input"
-          />
-          <ComposerAction />
+      <div
+        data-slot="aui_composer-shell"
+        className="flex w-full flex-col gap-1 rounded-[32px] border bg-background/95 backdrop-blur-sm p-4 shadow-lg transition-all focus-within:ring-1 focus-within:ring-ring/20"
+      >
+        <ComposerPrimitive.Input
+          placeholder="Ask FreetalkAI"
+          className="aui-composer-input max-h-32 min-h-[44px] w-full resize-none bg-transparent px-2 py-2 text-base outline-none placeholder:text-muted-foreground/60"
+          rows={1}
+          autoFocus
+          aria-label="Message input"
+        />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1">
+            {/* Empty space for alignment or future actions */}
+          </div>
+          <div className="flex items-center gap-2">
+            <ModelSelector />
+            <div className="h-4 w-[1px] bg-border mx-1" />
+            <ComposerAction />
+          </div>
         </div>
+      </div>
     </ComposerPrimitive.Root>
   );
 };
@@ -224,7 +220,7 @@ const AssistantMessage: FC = () => {
     >
       <div
         data-slot="aui_assistant-message-content"
-        className="wrap-break-word px-2 text-foreground leading-relaxed"
+        className="px-2 text-foreground leading-relaxed break-words max-w-full overflow-x-auto"
       >
         <MessagePrimitive.Parts>
           {({ part }) => {
@@ -391,5 +387,42 @@ const BranchPicker: FC<BranchPickerPrimitive.Root.Props> = ({
         </TooltipIconButton>
       </BranchPickerPrimitive.Next>
     </BranchPickerPrimitive.Root>
+  );
+};
+const ModelSelector: FC = () => {
+  const { selectedModel, setSelectedModel } = useModel();
+
+  const models = [
+    { id: "liquid/lfm-2.5-1.2b-thinking:free", name: "Liquid LFM 2.5 (Super Fast)" },
+    { id: "google/gemma-4-26b-a4b-it:free", name: "Gemma 4 26B (Smart & Fast)" },
+    { id: "poolside/laguna-m.1:free", name: "Poolside Laguna (Thinking/Coding - Slower)" },
+  ];
+
+  const currentModel = models.find((m) => m.id === selectedModel) || models[0];
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 gap-2 rounded-lg px-2 text-muted-foreground hover:text-foreground"
+        >
+          <Cpu className="size-3.5" />
+          <span className="text-xs font-medium">{currentModel.name}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="w-48">
+        {models.map((model) => (
+          <DropdownMenuItem
+            key={model.id}
+            onClick={() => setSelectedModel(model.id)}
+            className="text-xs"
+          >
+            {model.name}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

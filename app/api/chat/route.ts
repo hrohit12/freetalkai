@@ -26,16 +26,32 @@ export async function POST(req: Request) {
       messages,
       system,
       tools,
+      model = "liquid/lfm-2.5-1.2b-thinking:free",
     }: {
       messages: UIMessage[];
       system?: string;
       tools?: Record<string, { description?: string; parameters: JSONSchema7 }>;
+      model?: string;
     } = await req.json();
 
+    const convertedMessages = await convertToModelMessages(messages);
+    
+    // Preserve reasoning_details for OpenRouter multi-turn reasoning
+    const finalMessages = convertedMessages.map((msg, idx) => {
+      const originalMsg = messages[idx];
+      if (msg.role === "assistant" && originalMsg && (originalMsg as any).reasoning_details) {
+        return {
+          ...msg,
+          reasoning_details: (originalMsg as any).reasoning_details,
+        };
+      }
+      return msg;
+    });
+
     const result = streamText({
-      model: openrouter.chat("liquid/lfm-2.5-1.2b-thinking:free"),
-      messages: await convertToModelMessages(messages),
-      system,
+      model: openrouter.chat(model),
+      messages: finalMessages as any,
+      system: (system ? system + "\n\n" : "") + "CRITICAL: Always use structured markdown. Every single piece of code, HTML, or script MUST be wrapped in triple backticks with the correct language identifier (e.g. ```html). Never output raw HTML tags outside of code blocks.",
       tools: {
         ...frontendTools(tools ?? {}),
       },

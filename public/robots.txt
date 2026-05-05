@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://freetalkai.netlify.app/sitemap.xml
