@@ -8,30 +8,34 @@ import {
   type UIMessage,
 } from "ai";
 
-// Providers Configuration
-const openrouter = createOpenAI({
-  baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
-  headers: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://everydayai.in.net",
-    "X-OpenRouter-Title": "EverydayAI",
-  },
-});
-
-const groq = createOpenAI({
-  baseURL: "https://api.groq.com/openai/v1",
-  apiKey: process.env.GROQ_API_KEY,
-});
-
-const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
-
 export async function POST(req: Request) {
+  const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY;
+  const GROQ_KEY = process.env.GROQ_API_KEY;
+  const GEMINI_KEY = process.env.GEMINI_API_KEY;
+
   // Diagnostic check (Safe: only logs presence, not value)
-  if (!process.env.OPENROUTER_API_KEY && !process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
+  if (!OPENROUTER_KEY && !GROQ_KEY && !GEMINI_KEY) {
     console.error("CRITICAL: No API keys found in environment variables!");
   }
+
+  // Initialize providers inside the handler to ensure keys are fresh
+  const openrouter = createOpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: OPENROUTER_KEY,
+    headers: {
+      "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://everydayai.in.net",
+      "X-OpenRouter-Title": "EverydayAI",
+    },
+  });
+
+  const groq = createOpenAI({
+    baseURL: "https://api.groq.com/openai/v1",
+    apiKey: GROQ_KEY,
+  });
+
+  const google = createGoogleGenerativeAI({
+    apiKey: GEMINI_KEY,
+  });
 
   try {
     const {
@@ -76,13 +80,13 @@ export async function POST(req: Request) {
     const selectedProvider = getProviderModel(model);
 
     // Validate key for selected provider
-    if (selectedProvider.name === "OpenRouter" && !process.env.OPENROUTER_API_KEY) {
+    if (selectedProvider.name === "OpenRouter" && !OPENROUTER_KEY) {
       return new Response("Configuration Error: OPENROUTER_API_KEY is missing on the server. Please check your deployment environment variables.", { status: 500 });
     }
-    if (selectedProvider.name === "Groq" && !process.env.GROQ_API_KEY) {
+    if (selectedProvider.name === "Groq" && !GROQ_KEY) {
       return new Response("Configuration Error: GROQ_API_KEY is missing on the server. Please check your deployment environment variables.", { status: 500 });
     }
-    if (selectedProvider.name === "Gemini" && !process.env.GEMINI_API_KEY) {
+    if (selectedProvider.name === "Gemini" && !GEMINI_KEY) {
       return new Response("Configuration Error: GEMINI_API_KEY is missing on the server. Please check your deployment environment variables.", { status: 500 });
     }
 
