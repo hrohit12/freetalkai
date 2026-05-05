@@ -37,6 +37,9 @@ export const metadata: Metadata = {
     description: "No login, no cost, just pure intelligence.",
     images: ["/og-image.png"],
   },
+  other: {
+    monetag: "69f13a715741a0e916563f9d0ffafd08",
+  },
 };
 
 export default function RootLayout({
