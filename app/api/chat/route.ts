@@ -97,7 +97,7 @@ export async function POST(req: Request) {
 
       const fallbacks = [
         { name: "Groq", model: groq.chat("llama-3.3-70b-versatile") },
-        { name: "Gemini", model: google("gemini-1.5-flash") },
+        { name: "Gemini", model: google("gemini-2.5-flash") },
         { name: "OpenRouter", model: openrouter.chat("liquid/lfm-2.5-1.2b-thinking:free") }
       ].filter(f => f.name !== selectedProvider.name);
 
