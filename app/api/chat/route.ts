@@ -17,26 +17,35 @@ const openrouter = createOpenAI({
 });
 
 export async function POST(req: Request) {
-  const {
-    messages,
-    system,
-    tools,
-  }: {
-    messages: UIMessage[];
-    system?: string;
-    tools?: Record<string, { description?: string; parameters: JSONSchema7 }>;
-  } = await req.json();
+  if (!process.env.OPENROUTER_API_KEY) {
+    return new Response("Missing OPENROUTER_API_KEY environment variable.", { status: 500 });
+  }
 
-  const result = streamText({
-    model: openrouter.chat("liquid/lfm-2.5-1.2b-thinking:free"),
-    messages: await convertToModelMessages(messages),
-    system,
-    tools: {
-      ...frontendTools(tools ?? {}),
-    },
-  });
+  try {
+    const {
+      messages,
+      system,
+      tools,
+    }: {
+      messages: UIMessage[];
+      system?: string;
+      tools?: Record<string, { description?: string; parameters: JSONSchema7 }>;
+    } = await req.json();
 
-  return result.toUIMessageStreamResponse({
-    sendReasoning: true,
-  });
+    const result = streamText({
+      model: openrouter.chat("liquid/lfm-2.5-1.2b-thinking:free"),
+      messages: await convertToModelMessages(messages),
+      system,
+      tools: {
+        ...frontendTools(tools ?? {}),
+      },
+    });
+
+    return result.toUIMessageStreamResponse({
+      sendReasoning: true,
+    });
+  } catch (error) {
+    console.error("Chat API Error:", error);
+    return new Response("Internal Server Error", { status: 500 });
+  }
 }
