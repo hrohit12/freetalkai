@@ -106,13 +106,16 @@ export async function POST(req: Request) {
         sendReasoning: true,
       });
     } catch (error: any) {
-      const isRateLimit = error?.message?.toLowerCase().includes("rate limit") ||
-        error?.status === 429;
+      const errorText = error?.message?.toLowerCase() || "";
+      const isRateLimit = errorText.includes("rate limit") || 
+                         errorText.includes("quota exceeded") ||
+                         errorText.includes("daily limit") ||
+                         error?.status === 429;
 
       if (isRateLimit) {
         return new Response(
-          `The ${selectedProvider.name} limit has been reached or the API key is expired. Please try switching to a different model in the dropdown!`,
-          { status: 500 } // using 500 ensures the UI displays the actual text
+          `🚀 You've reached your daily quota or today's rate limit for ${selectedProvider.name}. Please try switching to a different model from the dropdown to continue chatting for free!`,
+          { status: 500 }
         );
       }
 
@@ -142,7 +145,7 @@ export async function POST(req: Request) {
         }
       }
 
-      return new Response("All models are currently busy or limited. Please try again later.", { status: 500 });
+      return new Response("🔒 All free models have reached their daily limits. Please try again tomorrow or switch to a different provider!", { status: 500 });
     }
   } catch (error: any) {
     console.error("Chat API Error:", error);
