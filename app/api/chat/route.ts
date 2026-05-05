@@ -42,7 +42,7 @@ export async function POST(req: Request) {
     } = await req.json();
 
     const convertedMessages = await convertToModelMessages(messages);
-    
+
     // Preserve reasoning_details for OpenRouter multi-turn reasoning
     const finalMessages = convertedMessages.map((msg, idx) => {
       const originalMsg = messages[idx];
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     };
 
     const selectedProvider = getProviderModel(model);
-    
+
     // We try the selected provider first
     try {
       const result = streamText({
@@ -82,19 +82,19 @@ export async function POST(req: Request) {
         sendReasoning: true,
       });
     } catch (error: any) {
-      const isRateLimit = error?.message?.toLowerCase().includes("rate limit") || 
-                          error?.status === 429;
-      
+      const isRateLimit = error?.message?.toLowerCase().includes("rate limit") ||
+        error?.status === 429;
+
       if (isRateLimit) {
         return new Response(
           `The ${selectedProvider.name} limit has been reached for today. Please switch to another model from the dropdown (like Gemini or OpenRouter) to continue chatting!`,
           { status: 429 }
         );
       }
-      
+
       // Fallback logic if it wasn't a rate limit
       console.error(`Selected provider ${selectedProvider.name} failed, trying failover...`, error);
-      
+
       const fallbacks = [
         { name: "Groq", model: groq.chat("llama-3.3-70b-versatile") },
         { name: "Gemini", model: google("gemini-1.5-flash") },
@@ -116,8 +116,11 @@ export async function POST(req: Request) {
           continue;
         }
       }
-      
+
       return new Response("All models are currently busy or limited. Please try again later.", { status: 500 });
     }
+  } catch (error: any) {
+    console.error("Chat API Error:", error);
+    return new Response(error?.message || "Internal Server Error", { status: 500 });
   }
 }
