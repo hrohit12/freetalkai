@@ -59,6 +59,7 @@ export async function POST(req: Request) {
 
     // Mapping for UI IDs to actual models
     const getProviderModel = (id: string) => {
+      if (id === "groq/llama-3.1-70b") return { name: "Groq", model: groq.chat("llama-3.3-70b-versatile") };
       if (id.startsWith("groq/")) return { name: "Groq", model: groq.chat(id.replace("groq/", "")) };
       if (id.startsWith("google/")) return { name: "Gemini", model: google(id.replace("google/", "")) };
       return { name: "OpenRouter", model: openrouter.chat(id) };
@@ -95,7 +96,7 @@ export async function POST(req: Request) {
       console.error(`Selected provider ${selectedProvider.name} failed, trying failover...`, error);
       
       const fallbacks = [
-        { name: "Groq", model: groq.chat("llama-3.1-70b-versatile") },
+        { name: "Groq", model: groq.chat("llama-3.3-70b-versatile") },
         { name: "Gemini", model: google("gemini-1.5-flash") },
         { name: "OpenRouter", model: openrouter.chat("liquid/lfm-2.5-1.2b-thinking:free") }
       ].filter(f => f.name !== selectedProvider.name);
