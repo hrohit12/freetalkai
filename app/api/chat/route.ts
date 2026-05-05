@@ -112,6 +112,7 @@ export async function POST(req: Request) {
                          errorText.includes("daily limit") ||
                          errorText.includes("failed after 3 attempts") ||
                          errorText.includes("free-models-per-day") ||
+                         errorText.includes("credits") ||
                          error?.status === 429;
 
       // If it's a rate limit, we try fallbacks first instead of immediately failing

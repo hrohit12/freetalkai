@@ -41,7 +41,8 @@ const AssistantContent = () => {
       const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
 
       if (lastMessage?.role === "assistant" && lastMessage.status?.type === "incomplete" && lastMessage.status.reason === "error") {
-        const errorMsg = (lastMessage.status.error as any)?.message || "";
+        const errorData = lastMessage.status.error;
+        const errorMsg = (typeof errorData === "string" ? errorData : (errorData as any)?.message || JSON.stringify(errorData) || "").toLowerCase();
         
         // Prevent duplicate alerts for the same error
         if (errorMsg && lastErrorRef.current !== errorMsg) {
