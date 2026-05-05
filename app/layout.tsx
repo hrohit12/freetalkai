@@ -49,14 +49,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script src="https://5gvci.com/act/files/tag.min.js?z=10967483" data-cfasync="false" async></script>
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Script
-          src="https://5gvci.com/act/files/tag.min.js?z=10967483"
-          data-cfasync="false"
-          strategy="afterInteractive"
-        />
         <TooltipProvider>{children}</TooltipProvider>
       </body>
     </html>

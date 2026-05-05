@@ -7,6 +7,7 @@ import {
 } from "@assistant-ui/react-ai-sdk";
 import { lastAssistantMessageIsCompleteWithToolCalls } from "ai";
 import { Thread } from "@/components/assistant-ui/thread";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, ExternalLink, Mail, Camera, Users, Code } from "lucide-react";
 import {
@@ -29,6 +30,32 @@ const AssistantContent = () => {
       body: { model: selectedModel },
     }),
   });
+
+  // Show a pop-up alert when a rate limit error is detected
+  const lastErrorRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    return runtime.thread.subscribe(() => {
+      const state = runtime.thread.getState();
+      const messages = state.messages;
+      const lastMessage = messages.length > 0 ? messages[messages.length - 1] : null;
+
+      if (lastMessage?.role === "assistant" && lastMessage.status?.type === "incomplete" && lastMessage.status.reason === "error") {
+        const errorMsg = (lastMessage.status.error as any)?.message || "";
+        
+        // Prevent duplicate alerts for the same error
+        if (errorMsg && lastErrorRef.current !== errorMsg) {
+          lastErrorRef.current = errorMsg;
+          
+          if (errorMsg.includes("quota") || errorMsg.includes("rate limit") || errorMsg.includes("attempts") || errorMsg.includes("limit")) {
+            alert("🚀 Daily Limit Reached!\n\nYou've reached your daily quota or today's rate limit for this model. \n\nPlease try switching to another model from the dropdown to continue chatting for free!");
+          }
+        }
+      } else if (lastMessage?.status?.type !== "incomplete" || lastMessage.status.reason !== "error") {
+        lastErrorRef.current = null;
+      }
+    });
+  }, [runtime.thread]);
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>

@@ -110,21 +110,16 @@ export async function POST(req: Request) {
       const isRateLimit = errorText.includes("rate limit") || 
                          errorText.includes("quota exceeded") ||
                          errorText.includes("daily limit") ||
+                         errorText.includes("failed after 3 attempts") ||
+                         errorText.includes("free-models-per-day") ||
                          error?.status === 429;
 
-      if (isRateLimit) {
-        return new Response(
-          `🚀 You've reached your daily quota or today's rate limit for ${selectedProvider.name}. Please try switching to a different model from the dropdown to continue chatting for free!`,
-          { status: 500 }
-        );
-      }
-
-      // Fallback logic if it wasn't a rate limit
-      console.error(`Selected provider ${selectedProvider.name} failed, trying failover...`, error);
+      // If it's a rate limit, we try fallbacks first instead of immediately failing
+      console.error(`Selected provider ${selectedProvider.name} failed (Rate Limit: ${isRateLimit}), trying fallbacks...`, errorText);
 
       const fallbacks = [
         { name: "Groq", model: groq.chat("llama-3.3-70b-versatile") },
-        { name: "Gemini", model: google("gemini-2.5-flash") },
+        { name: "Gemini", model: google("gemini-2.0-flash") },
         { name: "OpenRouter", model: openrouter.chat("liquid/lfm-2.5-1.2b-thinking:free") }
       ].filter(f => f.name !== selectedProvider.name);
 
@@ -134,18 +129,28 @@ export async function POST(req: Request) {
             model: fallback.model,
             messages: finalMessages as any,
             system: systemPrompt,
-            maxOutputTokens: 800, // Limit output to save tokens
+            maxOutputTokens: 800,
             tools: {
               ...frontendTools(tools ?? {}),
             },
           });
           return result.toUIMessageStreamResponse({ sendReasoning: true });
-        } catch (e) {
+        } catch (fallbackError: any) {
+          console.error(`Fallback ${fallback.name} failed...`);
           continue;
         }
       }
 
-      return new Response("🔒 All free models have reached their daily limits. Please try again tomorrow or switch to a different provider!", { status: 500 });
+      // If we reach here, EVERYTHING failed. 
+      // If the original error was a rate limit, show the specific message.
+      if (isRateLimit) {
+        return new Response(
+          `🚀 You've reached your daily quota or today's rate limit for ${selectedProvider.name}. Please try switching to a different model from the dropdown to continue chatting for free!`,
+          { status: 500 }
+        );
+      }
+
+      return new Response("🔒 All free models have reached their daily limits or are currently busy. Please try switching to another provider from the dropdown!", { status: 500 });
     }
   } catch (error: any) {
     console.error("Chat API Error:", error);
