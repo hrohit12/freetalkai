@@ -11,7 +11,7 @@ import {
 // Providers Configuration
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY || "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",
+  apiKey: process.env.OPENROUTER_API_KEY,
   headers: {
     "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://everydayai.in.net",
     "X-OpenRouter-Title": "EverydayAI",
@@ -20,11 +20,11 @@ const openrouter = createOpenAI({
 
 const groq = createOpenAI({
   baseURL: "https://api.groq.com/openai/v1",
-  apiKey: process.env.GROQ_API_KEY || "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",
+  apiKey: process.env.GROQ_API_KEY,
 });
 
 const google = createGoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY || "AIzaSyA_kreinfjXfFBB2Oz4irXcB_VW7PCH17o",
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 export async function POST(req: Request) {
