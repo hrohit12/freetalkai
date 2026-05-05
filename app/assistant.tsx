@@ -8,7 +8,7 @@ import {
 import { lastAssistantMessageIsCompleteWithToolCalls } from "ai";
 import { Thread } from "@/components/assistant-ui/thread";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, ExternalLink, Mail } from "lucide-react";
+import { RotateCcw, ExternalLink, Mail, Camera, Users, Code } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,7 +64,7 @@ const AssistantContent = () => {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-2 py-2.5 rounded-lg cursor-pointer focus:bg-indigo-50 focus:text-indigo-600 transition-colors"
                   >
-                    <ExternalLink className="size-4 text-slate-500" />
+                    <Camera className="size-4 text-pink-500" />
                     <span className="font-medium">Instagram</span>
                   </a>
                 </DropdownMenuItem>
@@ -75,7 +75,7 @@ const AssistantContent = () => {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-2 py-2.5 rounded-lg cursor-pointer focus:bg-indigo-50 focus:text-indigo-600 transition-colors"
                   >
-                    <ExternalLink className="size-4 text-slate-500" />
+                    <Users className="size-4 text-blue-600" />
                     <span className="font-medium">LinkedIn</span>
                   </a>
                 </DropdownMenuItem>
@@ -86,7 +86,7 @@ const AssistantContent = () => {
                     rel="noopener noreferrer"
                     className="flex items-center gap-3 px-2 py-2.5 rounded-lg cursor-pointer focus:bg-indigo-50 focus:text-indigo-600 transition-colors"
                   >
-                    <ExternalLink className="size-4 text-slate-500" />
+                    <Code className="size-4 text-slate-900" />
                     <span className="font-medium">GitHub</span>
                   </a>
                 </DropdownMenuItem>
