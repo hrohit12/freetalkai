@@ -9,6 +9,7 @@ import { lastAssistantMessageIsCompleteWithToolCalls } from "ai";
 import { Thread } from "@/components/assistant-ui/thread";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, ExternalLink, Mail } from "lucide-react";
+import { AdBanner } from "@/components/AdBanner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -100,6 +101,7 @@ export const Assistant = () => {
             </Button>
           </div>
         </header>
+        <AdBanner />
         <main className="flex-1 overflow-hidden z-0">
           <Thread />
         </main>
