@@ -43,9 +43,12 @@ export async function POST(req: Request) {
 
     const convertedMessages = await convertToModelMessages(messages);
 
-    // Preserve reasoning_details for OpenRouter multi-turn reasoning
-    const finalMessages = convertedMessages.map((msg, idx) => {
-      const originalMsg = messages[idx];
+    // Preserve reasoning_details for OpenRouter multi-turn reasoning and LIMIT history to last 6 messages
+    const recentMessages = convertedMessages.slice(-6);
+    const recentOriginalMessages = messages.slice(-6);
+    
+    const finalMessages = recentMessages.map((msg, idx) => {
+      const originalMsg = recentOriginalMessages[idx];
       if (msg.role === "assistant" && originalMsg && (originalMsg as any).reasoning_details) {
         return {
           ...msg,
@@ -73,6 +76,7 @@ export async function POST(req: Request) {
         model: selectedProvider.model,
         messages: finalMessages as any,
         system: systemPrompt,
+        maxTokens: 800, // Limit output to save tokens
         tools: {
           ...frontendTools(tools ?? {}),
         },
@@ -87,8 +91,8 @@ export async function POST(req: Request) {
 
       if (isRateLimit) {
         return new Response(
-          `The ${selectedProvider.name} limit has been reached for today. Please switch to another model from the dropdown (like Gemini or OpenRouter) to continue chatting!`,
-          { status: 429 }
+          `The ${selectedProvider.name} limit has been reached or the API key is expired. Please try switching to a different model in the dropdown!`,
+          { status: 500 } // using 500 ensures the UI displays the actual text
         );
       }
 
@@ -107,6 +111,7 @@ export async function POST(req: Request) {
             model: fallback.model,
             messages: finalMessages as any,
             system: systemPrompt,
+            maxTokens: 800, // Limit output to save tokens
             tools: {
               ...frontendTools(tools ?? {}),
             },
