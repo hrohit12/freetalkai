@@ -28,6 +28,11 @@ const google = createGoogleGenerativeAI({
 });
 
 export async function POST(req: Request) {
+  // Diagnostic check (Safe: only logs presence, not value)
+  if (!process.env.OPENROUTER_API_KEY && !process.env.GROQ_API_KEY && !process.env.GEMINI_API_KEY) {
+    console.error("CRITICAL: No API keys found in environment variables!");
+  }
+
   try {
     const {
       messages,
@@ -69,6 +74,17 @@ export async function POST(req: Request) {
     };
 
     const selectedProvider = getProviderModel(model);
+
+    // Validate key for selected provider
+    if (selectedProvider.name === "OpenRouter" && !process.env.OPENROUTER_API_KEY) {
+      return new Response("Configuration Error: OPENROUTER_API_KEY is missing on the server. Please check your deployment environment variables.", { status: 500 });
+    }
+    if (selectedProvider.name === "Groq" && !process.env.GROQ_API_KEY) {
+      return new Response("Configuration Error: GROQ_API_KEY is missing on the server. Please check your deployment environment variables.", { status: 500 });
+    }
+    if (selectedProvider.name === "Gemini" && !process.env.GEMINI_API_KEY) {
+      return new Response("Configuration Error: GEMINI_API_KEY is missing on the server. Please check your deployment environment variables.", { status: 500 });
+    }
 
     // We try the selected provider first
     try {
