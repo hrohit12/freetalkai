@@ -1,4 +1,5 @@
 import { createOpenAI } from "@ai-sdk/openai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { frontendTools } from "@assistant-ui/react-ai-sdk";
 import {
   type JSONSchema7,
@@ -7,20 +8,26 @@ import {
   type UIMessage,
 } from "ai";
 
+// Providers Configuration
 const openrouter = createOpenAI({
   baseURL: "https://openrouter.ai/api/v1",
-  apiKey: process.env.OPENROUTER_API_KEY,
+  apiKey: process.env.OPENROUTER_API_KEY || "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",
   headers: {
-    "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://freetalkai.netlify.app",
-    "X-OpenRouter-Title": "FreetalkAI",
+    "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL || "https://everydayai.in.net",
+    "X-OpenRouter-Title": "EverydayAI",
   },
 });
 
-export async function POST(req: Request) {
-  if (!process.env.OPENROUTER_API_KEY) {
-    return new Response("Missing OPENROUTER_API_KEY environment variable.", { status: 500 });
-  }
+const groq = createOpenAI({
+  baseURL: "https://api.groq.com/openai/v1",
+  apiKey: process.env.GROQ_API_KEY || "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",
+});
 
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY || "AIzaSyA_kreinfjXfFBB2Oz4irXcB_VW7PCH17o",
+});
+
+export async function POST(req: Request) {
   try {
     const {
       messages,
@@ -48,20 +55,68 @@ export async function POST(req: Request) {
       return msg;
     });
 
-    const result = streamText({
-      model: openrouter.chat(model),
-      messages: finalMessages as any,
-      system: (system ? system + "\n\n" : "") + "CRITICAL: Always use structured markdown. Every single piece of code, HTML, or script MUST be wrapped in triple backticks with the correct language identifier (e.g. ```html). Never output raw HTML tags outside of code blocks.",
-      tools: {
-        ...frontendTools(tools ?? {}),
-      },
-    });
+    const systemPrompt = (system ? system + "\n\n" : "") + "CRITICAL: Always use structured markdown. Every single piece of code, HTML, or script MUST be wrapped in triple backticks with the correct language identifier (e.g. ```html). Never output raw HTML tags outside of code blocks.";
 
-    return result.toUIMessageStreamResponse({
-      sendReasoning: true,
-    });
-  } catch (error) {
-    console.error("Chat API Error:", error);
-    return new Response("Internal Server Error", { status: 500 });
+    // Mapping for UI IDs to actual models
+    const getProviderModel = (id: string) => {
+      if (id.startsWith("groq/")) return { name: "Groq", model: groq.chat(id.replace("groq/", "")) };
+      if (id.startsWith("google/")) return { name: "Gemini", model: google(id.replace("google/", "")) };
+      return { name: "OpenRouter", model: openrouter.chat(id) };
+    };
+
+    const selectedProvider = getProviderModel(model);
+    
+    // We try the selected provider first
+    try {
+      const result = streamText({
+        model: selectedProvider.model,
+        messages: finalMessages as any,
+        system: systemPrompt,
+        tools: {
+          ...frontendTools(tools ?? {}),
+        },
+      });
+
+      return result.toUIMessageStreamResponse({
+        sendReasoning: true,
+      });
+    } catch (error: any) {
+      const isRateLimit = error?.message?.toLowerCase().includes("rate limit") || 
+                          error?.status === 429;
+      
+      if (isRateLimit) {
+        return new Response(
+          `The ${selectedProvider.name} limit has been reached for today. Please switch to another model from the dropdown (like Gemini or OpenRouter) to continue chatting!`,
+          { status: 429 }
+        );
+      }
+      
+      // Fallback logic if it wasn't a rate limit
+      console.error(`Selected provider ${selectedProvider.name} failed, trying failover...`, error);
+      
+      const fallbacks = [
+        { name: "Groq", model: groq.chat("llama-3.1-70b-versatile") },
+        { name: "Gemini", model: google("gemini-1.5-flash") },
+        { name: "OpenRouter", model: openrouter.chat("liquid/lfm-2.5-1.2b-thinking:free") }
+      ].filter(f => f.name !== selectedProvider.name);
+
+      for (const fallback of fallbacks) {
+        try {
+          const result = streamText({
+            model: fallback.model,
+            messages: finalMessages as any,
+            system: systemPrompt,
+            tools: {
+              ...frontendTools(tools ?? {}),
+            },
+          });
+          return result.toUIMessageStreamResponse({ sendReasoning: true });
+        } catch (e) {
+          continue;
+        }
+      }
+      
+      return new Response("All models are currently busy or limited. Please try again later.", { status: 500 });
+    }
   }
 }

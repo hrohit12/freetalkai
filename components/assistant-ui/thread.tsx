@@ -79,7 +79,7 @@ export const Thread: FC = () => {
             <div className="mx-auto w-full max-w-(--thread-max-width) px-4">
               <Composer />
               <p className="mt-3 text-center text-[11px] text-muted-foreground/60">
-                FreetalkAI can make mistakes. Check important info
+                EverydayAI can make mistakes. Check important info
               </p>
             </div>
           </ThreadPrimitive.ViewportFooter>
@@ -142,7 +142,7 @@ const Composer: FC = () => {
         className="flex w-full flex-col gap-1 rounded-[32px] border bg-background/95 backdrop-blur-sm p-4 shadow-lg transition-all focus-within:ring-1 focus-within:ring-ring/20"
       >
         <ComposerPrimitive.Input
-          placeholder="Ask FreetalkAI"
+          placeholder="Ask EverydayAI"
           className="aui-composer-input max-h-32 min-h-[44px] w-full resize-none bg-transparent px-2 py-2 text-base outline-none placeholder:text-muted-foreground/60"
           rows={1}
           autoFocus
@@ -393,9 +393,10 @@ const ModelSelector: FC = () => {
   const { selectedModel, setSelectedModel } = useModel();
 
   const models = [
-    { id: "liquid/lfm-2.5-1.2b-thinking:free", name: "Liquid LFM 2.5 (Super Fast)" },
-    { id: "google/gemma-4-26b-a4b-it:free", name: "Gemma 4 26B (Smart & Fast)" },
-    { id: "poolside/laguna-m.1:free", name: "Poolside Laguna (Thinking/Coding - Slower)" },
+    { id: "groq/llama-3.1-70b", name: "Groq Llama 3.1 (Instant)" },
+    { id: "google/gemini-1.5-flash", name: "Gemini 1.5 Flash (Smart & Fast)" },
+    { id: "liquid/lfm-2.5-1.2b-thinking:free", name: "Liquid LFM 2.5 (Thinking)" },
+    { id: "poolside/laguna-m.1:free", name: "Poolside Laguna (Coding)" },
   ];
 
   const currentModel = models.find((m) => m.id === selectedModel) || models[0];

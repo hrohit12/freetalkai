@@ -43,7 +43,7 @@ const AssistantContent = () => {
               onClick={() => window.location.reload()}
               className="text-xl font-bold tracking-tight text-slate-900 transition-opacity hover:opacity-70 cursor-pointer"
             >
-              FreetalkAI
+              EverydayAI
             </button>
           </div>
           <div className="flex items-center gap-4">

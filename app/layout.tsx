@@ -15,25 +15,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FreetalkAI - Free AI Chat Assistant (No Login)",
-  description: "Access powerful AI models for free. FreetalkAI is a fast, intelligent, and friction-less chat assistant with no signup required.",
-  keywords: ["free ai chat", "no login ai", "openrouter chat", "freetalk ai", "ai assistant"],
+  title: "EverydayAI - Free AI Chat Assistant (No Login)",
+  description: "Access powerful AI models for free. EverydayAI is a fast, intelligent, and friction-less chat assistant with no signup required.",
+  keywords: ["free ai chat", "no login ai", "openrouter chat", "everyday ai", "ai assistant", "everydayai.in.net"],
   openGraph: {
-    title: "FreetalkAI - Free AI Chat Assistant",
-    description: "Fast, intelligent chat with no login required. Powered by FreetalkAI.",
+    title: "EverydayAI - Free AI Chat Assistant",
+    description: "Fast, intelligent chat with no login required. Powered by EverydayAI.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "FreetalkAI Preview",
+        alt: "EverydayAI Preview",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "FreetalkAI - Free AI Chat Assistant",
+    title: "EverydayAI - Free AI Chat Assistant",
     description: "No login, no cost, just pure intelligence.",
     images: ["/og-image.png"],
   },
