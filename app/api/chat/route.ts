@@ -76,7 +76,7 @@ export async function POST(req: Request) {
         model: selectedProvider.model,
         messages: finalMessages as any,
         system: systemPrompt,
-        maxTokens: 800, // Limit output to save tokens
+        maxOutputTokens: 800, // Limit output to save tokens
         tools: {
           ...frontendTools(tools ?? {}),
         },
@@ -111,7 +111,7 @@ export async function POST(req: Request) {
             model: fallback.model,
             messages: finalMessages as any,
             system: systemPrompt,
-            maxTokens: 800, // Limit output to save tokens
+            maxOutputTokens: 800, // Limit output to save tokens
             tools: {
               ...frontendTools(tools ?? {}),
             },
