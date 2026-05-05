@@ -29,7 +29,7 @@ export const Assistant = () => {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="flex h-dvh w-full flex-col bg-[#fcfcfc] relative overflow-hidden">
+      <div className="flex h-dvh w-full flex-col bg-[#fcfcfc] relative overflow-hidden overscroll-none">
         {/* Abstract Background Decoration */}
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-50/50 rounded-full blur-[120px] -z-10" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-50/50 rounded-full blur-[120px] -z-10" />

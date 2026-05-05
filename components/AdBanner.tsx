@@ -25,8 +25,8 @@ export const AdBanner = () => {
   }, []);
 
   return (
-    <div className="flex justify-center py-2 bg-white/50 border-b">
-      <div ref={bannerRef} />
+    <div className="hidden md:flex justify-center py-2 bg-white/50 border-b overflow-hidden">
+      <div className="max-w-full overflow-hidden" ref={bannerRef} />
     </div>
   );
 };
