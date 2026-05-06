@@ -395,7 +395,6 @@ const ModelSelector: FC = () => {
   const models = [
     { id: "groq/llama-3.1-70b", name: "Groq Llama 3.1 (Instant)" },
     { id: "google/gemini-2.5-flash", name: "Gemini 2.5 Flash (Smart & Fast)" },
-    { id: "liquid/lfm-2.5-1.2b-thinking:free", name: "Liquid LFM 2.5 (Thinking)" },
     { id: "poolside/laguna-m.1:free", name: "Poolside Laguna (Coding)" },
   ];
 
