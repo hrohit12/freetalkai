@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://everydayai.in.net"),
   title: "EverydayAI - Free AI Chat Assistant (No Login)",
   description: "Access powerful AI models for free. EverydayAI is a fast, intelligent, and friction-less chat assistant with no signup required.",
   keywords: ["free ai chat", "no login ai", "openrouter chat", "everyday ai", "ai assistant", "everydayai.in.net"],
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
     images: ["/og-image.png"],
   },
   other: {
-    monetag: "69f13a715741a0e916563f9d0ffafd08",
+    monetag: "814302b668f949d3dcae34dd5f9ffe3d",
   },
 };
 
