@@ -51,7 +51,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <script src="https://5gvci.com/act/files/tag.min.js?z=10967483" data-cfasync="false" async></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(s){s.dataset.zone='10970751',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
